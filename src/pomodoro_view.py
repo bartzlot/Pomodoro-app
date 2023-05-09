@@ -7,10 +7,11 @@ class TimerMenu:
     hour = 0
     min = 0
     sec = 0
+    running = True
     sg.theme('DarkAmber') 
-    layout = [  [sg.Text("Ilość godzin:"), sg.Button('+', key='Hp'), sg.Input(str(hour),key='HOURS'), sg.Button('-', key='Hm')],
-            [sg.Text("Ilość minut:"), sg.Button('+', key='Mp'), sg.Input(str(hour),key='MINUTES'), sg.Button('-', key='Mm')],
-            [sg.Text("Ilość sekund:"), sg.Button('+', key='Sp'), sg.Input(str(hour),key='SECONDS'), sg.Button('-', key='Sm')],
+    layout = [  [sg.Text("Ilość godzin:"), sg.Button('+', key='Hp'), sg.Input(hour,key='HOURS'), sg.Button('-', key='Hm')],
+            [sg.Text("Ilość minut:"), sg.Button('+', key='Mp'), sg.Input(hour,key='MINUTES'), sg.Button('-', key='Mm')],
+            [sg.Text("Ilość sekund:"), sg.Button('+', key='Sp'), sg.Input(hour,key='SECONDS'), sg.Button('-', key='Sm')],
             [sg.Button('START SESSION')],
             ]
     
@@ -57,14 +58,29 @@ class TimerMenu:
                 # sec = minutes_validation(sec)
                 window['SECONDS'].update(value=str(self.sec))
             if event == 'START SESSION':
-                layout1 = [[sg.Text('', justification='center', key='timer')]]
-                window = sg.Window('Timer', layout1)
-                t = 0
-                while True:
-                    event, values = window.read(timeout=0)
-                    window['timer'].update(str(t))
-                    time.sleep(1)
-                    t+=1
+                self.hour = int(values['HOURS'])
+                Tm = TimerWindow
+                Tm.start_timer_window(self)
 
+
+        window.close()
+
+
+class TimerWindow(TimerMenu):
+
+
+    def start_timer_window(self):
+        layout1 = [[sg.Text('{:02d}:{:02d}:{:02d}'.format(self.hour,self.hour,self.hour,), justification='center', key='timer')]]
+        window = sg.Window('Timer', layout1)
+        t = 0
+        while self.running is True:
+            event, values = window.read(timeout=0)
+            if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
+                return
+            if self.hour == 10:
+                self.running = False
+            window['timer'].update('{:02d}:{:02d}:{:02d}'.format(self.hour,self.hour,self.hour,))
+            time.sleep(1)
+            self.hour += 1
 
         window.close()
