@@ -9,9 +9,9 @@ class TimerMenu:
     sec = 0
     running = True
     sg.theme('DarkAmber') 
-    layout = [  [sg.Text("Ilość godzin:"), sg.Button('+', key='Hp'), sg.Input(hour,key='HOURS'), sg.Button('-', key='Hm')],
-            [sg.Text("Ilość minut:"), sg.Button('+', key='Mp'), sg.Input(hour,key='MINUTES'), sg.Button('-', key='Mm')],
-            [sg.Text("Ilość sekund:"), sg.Button('+', key='Sp'), sg.Input(hour,key='SECONDS'), sg.Button('-', key='Sm')],
+    layout = [  [sg.Text("Nmber of hours:"), sg.Button('+', key='Hp'), sg.Input(hour,key='HOURS'), sg.Button('-', key='Hm')],
+            [sg.Text("Number of minutes:"), sg.Button('+', key='Mp'), sg.Input(hour,key='MINUTES'), sg.Button('-', key='Mm')],
+            [sg.Text("Number of seconds:"), sg.Button('+', key='Sp'), sg.Input(hour,key='SECONDS'), sg.Button('-', key='Sm')],
             [sg.Button('START SESSION')],
             ]
 
@@ -68,16 +68,89 @@ class TimerMenu:
                 
         window.close()
 
+class Optionsmenu():
 
-class TimerWindow(TimerMenu):
+    default_break_time = 0
+    default_session_time = 0
+    default_big_break_time = 0
+    default_big_break_count = 0
+    DEFAULTS = [5, 20, 20, 4]
+
+    def start_options_window(self):
+        options_layout = [[[sg.Text("Default session time(min):"), sg.Button('+', key='DSTP'), sg.Input(self.default_session_time,key='DST'), sg.Button('-', key='DSTM')]],
+                        [[sg.Text("Default break time(min):"), sg.Button('+', key='DBTP'), sg.Input(self.default_session_time,key='DBT'), sg.Button('-', key='DBTM')]],
+                        [[sg.Text("Default big break time(min):"), sg.Button('+', key='DBBTP'), sg.Input(self.default_session_time,key='DBBT'), sg.Button('-', key='DBBTM')]],
+                        [[sg.Text("Default sessions count before big break:"), sg.Button('+', key='DBBCP'), sg.Input(self.default_session_time,key='DBBC'), sg.Button('-', key='DBBCM')]],
+                        [sg.Button('DEFAULTS'), sg.Button('BACK'), sg.Button('APPLY')]
+                      ]
+        options_window = sg.Window('Options', options_layout)
+        
+        while True:
+            event, values = options_window.read(timeout=0)
+
+            if event == sg.WIN_CLOSED:
+                break
+
+            if event == 'DSTP':
+                self.default_session_time += 1
+                options_window['DST'].update(self.default_session_time)\
+            
+            if event == 'DSTM':
+                self.default_session_time -= 1
+                options_window['DST'].update(self.default_session_time)
+
+            if event == 'DBTP':
+                self.default_break_time += 1
+                options_window['DBT'].update(self.default_break_time)
+
+            if event == 'DBTM':
+                self.default_break_time -= 1
+                options_window['DBT'].update(self.default_break_time)
+
+            if event == 'DBBTP':
+                self.default_big_break_time += 1
+                options_window['DBBT'].update(self.default_big_break_time)
+
+            if event == 'DBBTM':
+                self.default_big_break_time -= 1
+                options_window['DBBT'].update(self.default_big_break_time)
+
+            if event == 'DBBCP':
+                self.default_big_break_count += 1
+                options_window['DBBC'].update(self.default_big_break_count)
+            
+            if event == 'DBBCM':
+                self.default_big_break_count -= 1
+                options_window['DBBC'].update(self.default_big_break_count)
+
+            if event == 'DEFAULTS':
+                self.default_break_time = self.DEFAULTS[0]
+                self.default_session_time = self.DEFAULTS[1]
+                self.default_big_break_time = self.DEFAULTS[2]
+                self.default_big_break_count = self.DEFAULTS[3]
+                options_window['DBBC'].update(self.default_big_break_count)
+                options_window['DBBT'].update(self.default_big_break_time)
+                options_window['DBT'].update(self.default_break_time)
+                options_window['DST'].update(self.default_session_time)
+            
+            if event == 'BACK':
+                return
+            
+            if event == 'APPLY':
+                self.default_break_time = int(values['DBT'])
+                self.default_session_time = int(values['DST'])
+                self.default_big_break_time = int(values['DBBT'])
+                self.default_big_break_count = int(values['DBBC'])
+                print(self.default_big_break_count)
+class TimerWindow(TimerMenu, Optionsmenu):
 
 
     def start_timer_window(self):
         self.running = True
-        default_break_time = 10
-        default_session_time = 10
-        default_big_break_time = 20
-        default_big_break_count = 4
+        self.default_break_time = 10
+        self.default_session_time = 10
+        self.default_big_break_time = 20
+        self.default_big_break_count = 4
         total_countdown_time = self.hour * 3600 + self.min * 60 + self.sec
         time_gone = 0
         total_pomodoros = 0
@@ -120,7 +193,7 @@ class TimerWindow(TimerMenu):
                     else:
                         timer_window['LABEL'].update('Time for break!')
 
-                        while time_gone < default_break_time:
+                        while time_gone < self.default_break_time:
                             
                             if total_countdown_time == -1:
                                 break
@@ -142,7 +215,9 @@ class TimerWindow(TimerMenu):
         timer_window.close()
         return
 
-        
+
+
+
 
         
 
