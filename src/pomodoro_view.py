@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-import time
+import time, datetime
 from pomodoro_modules import(  hours_validation,
                                 minutes_validation,
                              )
@@ -14,18 +14,17 @@ class TimerMenu:
             [sg.Text("Ilość sekund:"), sg.Button('+', key='Sp'), sg.Input(hour,key='SECONDS'), sg.Button('-', key='Sm')],
             [sg.Button('START SESSION')],
             ]
-    
-    
+
+   
     def start_timer_menu(self):
         
-        # Create the Windowss
-        window = sg.Window('Pomodoro-App', self.layout)
-        # Event Loop to process "events" and get the "values" of the inputs
+        window = sg.Window('Pomodoro-App', self.layout, finalize=True)
 
         while True:
-            event, values = window.read(timeout=10)
+            event, values = window.read(timeout=0)
             
-            if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
+            
+            if event == sg.WIN_CLOSED:
                 break
 
             if event == 'Hp':
@@ -57,12 +56,16 @@ class TimerMenu:
                 self.sec += 1
                 # sec = minutes_validation(sec)
                 window['SECONDS'].update(value=str(self.sec))
+
             if event == 'START SESSION':
                 self.hour = int(values['HOURS'])
+                self.min = int(values['MINUTES'])
+                self.sec = int(values['SECONDS'])
+                window.Hide()  
                 Tm = TimerWindow
                 Tm.start_timer_window(self)
-
-
+                window.UnHide()
+                
         window.close()
 
 
@@ -70,17 +73,77 @@ class TimerWindow(TimerMenu):
 
 
     def start_timer_window(self):
-        layout1 = [[sg.Text('{:02d}:{:02d}:{:02d}'.format(self.hour,self.hour,self.hour,), justification='center', key='timer')]]
-        window = sg.Window('Timer', layout1)
-        t = 0
-        while self.running is True:
-            event, values = window.read(timeout=0)
-            if event == sg.WIN_CLOSED: # if user closes window or clicks cancel
-                return
-            if self.hour == 10:
-                self.running = False
-            window['timer'].update('{:02d}:{:02d}:{:02d}'.format(self.hour,self.hour,self.hour,))
-            time.sleep(1)
-            self.hour += 1
+        self.running = True
+        default_break_time = 10
+        default_session_time = 10
+        default_big_break_time = 20
+        default_big_break_count = 4
+        total_countdown_time = self.hour * 3600 + self.min * 60 + self.sec
+        time_gone = 0
+        total_pomodoros = 0
+        timer = datetime.timedelta(seconds=total_countdown_time)
+        layout1 = [
+                    [sg.Text('', justification='center', key='LABEL')],
+                    [sg.Text(timer, justification='center', key='TIMER')],
+                    [sg.Button('Cancel', key='CANCEL')]
+                   ]
+        
+        timer_window = sg.Window('Timer', layout1)
 
-        window.close()
+        while self.running is True:
+            event, values = timer_window.read(timeout=0)
+            timer_window['LABEL'].update('Time to learn!')
+
+            while total_countdown_time > 0:
+                event, values = timer_window.read(timeout=0)
+                if event == sg.WIN_CLOSED or total_countdown_time == -1 or event == 'CANCEL':
+                    break
+
+                total_countdown_time -= 1
+                if time_gone == default_session_time:
+                    total_pomodoros += 1
+                    time_gone = 0
+
+                    if total_pomodoros % default_big_break_count == 0:
+                        timer_window['LABEL'].update('Time for big break!')
+
+                        while time_gone < default_big_break_time:
+                            timer_window['TIMER'].update(timer)
+                            if total_countdown_time == -1:
+                                break
+                            timer = datetime.timedelta(seconds=total_countdown_time)
+                            event = timer_window.read(timeout=0)
+                            timer_window['TIMER'].update(timer)
+                            total_countdown_time -= 1
+                            time.sleep(1)
+                            time_gone += 1
+                    else:
+                        timer_window['LABEL'].update('Time for break!')
+
+                        while time_gone < default_break_time:
+                            
+                            if total_countdown_time == -1:
+                                break
+                            timer = datetime.timedelta(seconds=total_countdown_time)
+                            event = timer_window.read(timeout=0)
+                            timer_window['TIMER'].update(timer)
+                            total_countdown_time -= 1 
+                            time.sleep(1)
+                            time_gone += 1                            
+                        time_gone = 0
+                event = timer_window.read(timeout=0)
+                timer_window['LABEL'].update('Time to learn!')
+                timer = datetime.timedelta(seconds=total_countdown_time)
+                timer_window['TIMER'].update(timer)
+                time.sleep(1)
+                time_gone +=1
+                
+            self.running = False
+        timer_window.close()
+        return
+
+        
+
+        
+
+    
