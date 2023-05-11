@@ -3,86 +3,23 @@ import time, datetime
 from pomodoro_modules import(  hours_validation,
                                 minutes_validation,
                              )
-class TimerMenu:
-    hour = 0
-    min = 0
-    sec = 0
-    running = True
-    sg.theme('DarkAmber') 
-    layout = [  [sg.Text("Nmber of hours:"), sg.Button('+', key='Hp'), sg.Input(hour,key='HOURS'), sg.Button('-', key='Hm')],
-            [sg.Text("Number of minutes:"), sg.Button('+', key='Mp'), sg.Input(hour,key='MINUTES'), sg.Button('-', key='Mm')],
-            [sg.Text("Number of seconds:"), sg.Button('+', key='Sp'), sg.Input(hour,key='SECONDS'), sg.Button('-', key='Sm')],
-            [sg.Button('START SESSION')],
-            ]
-
-   
-    def start_timer_menu(self):
-        
-        window = sg.Window('Pomodoro-App', self.layout, finalize=True)
-
-        while True:
-            event, values = window.read(timeout=0)
-            
-            
-            if event == sg.WIN_CLOSED:
-                break
-
-            if event == 'Hp':
-                self.hour += 1
-                # hour = hours_validation(hour)
-                window['HOURS'].update(value=str(self.hour))
-                
-            if event == 'Hm':
-                self.hour -= 1
-                # hour = hours_validation(hour)
-                window['HOURS'].update(value=str(self.hour))
-
-            if event == 'Mm':
-                self.min -= 1
-                # min = minutes_validation(min)
-                window['MINUTES'].update(value=str(self.min))
-
-            if event == 'Mp':
-                self.min += 1
-                # min = minutes_validation(min)
-                window['MINUTES'].update(value=str(self.min))
-
-            if event == 'Sm':
-                self.sec -= 1
-                # sec = minutes_validation(sec)
-                window['SECONDS'].update(value=str(self.sec))
-
-            if event == 'Sp':
-                self.sec += 1
-                # sec = minutes_validation(sec)
-                window['SECONDS'].update(value=str(self.sec))
-
-            if event == 'START SESSION':
-                self.hour = int(values['HOURS'])
-                self.min = int(values['MINUTES'])
-                self.sec = int(values['SECONDS'])
-                window.Hide()  
-                Tm = TimerWindow
-                Tm.start_timer_window(self)
-                window.UnHide()
-                
-        window.close()
 
 class Optionsmenu():
 
-    default_break_time = 0
-    default_session_time = 0
-    default_big_break_time = 0
-    default_big_break_count = 0
+    default_break_time = 5
+    default_session_time = 20
+    default_big_break_time = 20
+    default_big_break_count = 4
     DEFAULTS = [5, 20, 20, 4]
-
+    sg.theme('DarkAmber')
+    
     def start_options_window(self):
         options_layout = [[[sg.Text("Default session time(min):"), sg.Button('+', key='DSTP'), sg.Input(self.default_session_time,key='DST'), sg.Button('-', key='DSTM')]],
-                        [[sg.Text("Default break time(min):"), sg.Button('+', key='DBTP'), sg.Input(self.default_session_time,key='DBT'), sg.Button('-', key='DBTM')]],
-                        [[sg.Text("Default big break time(min):"), sg.Button('+', key='DBBTP'), sg.Input(self.default_session_time,key='DBBT'), sg.Button('-', key='DBBTM')]],
-                        [[sg.Text("Default sessions count before big break:"), sg.Button('+', key='DBBCP'), sg.Input(self.default_session_time,key='DBBC'), sg.Button('-', key='DBBCM')]],
-                        [sg.Button('DEFAULTS'), sg.Button('BACK'), sg.Button('APPLY')]
-                      ]
+                            [[sg.Text("Default break time(min):"), sg.Button('+', key='DBTP'), sg.Input(self.default_break_time,key='DBT'), sg.Button('-', key='DBTM')]],
+                            [[sg.Text("Default big break time(min):"), sg.Button('+', key='DBBTP'), sg.Input(self.default_big_break_time,key='DBBT'), sg.Button('-', key='DBBTM')]],
+                            [[sg.Text("Default sessions count before big break:"), sg.Button('+', key='DBBCP'), sg.Input(self.default_big_break_count,key='DBBC'), sg.Button('-', key='DBBCM')]],
+                            [sg.Button('DEFAULTS'), sg.Button('BACK'), sg.Button('APPLY')]
+                        ]   
         options_window = sg.Window('Options', options_layout)
         
         while True:
@@ -134,6 +71,7 @@ class Optionsmenu():
                 options_window['DST'].update(self.default_session_time)
             
             if event == 'BACK':
+                options_window.close()
                 return
             
             if event == 'APPLY':
@@ -142,15 +80,76 @@ class Optionsmenu():
                 self.default_big_break_time = int(values['DBBT'])
                 self.default_big_break_count = int(values['DBBC'])
                 print(self.default_big_break_count)
+
+
+class TimerMenu(Optionsmenu):
+    hour = 0
+    min = 0
+    sec = 0
+    running = True
+    sg.theme('DarkAmber')
+   
+    def start_timer_menu(self):
+        layout = [  [sg.Text("Nmber of hours:"), sg.Button('+', key='Hp'), sg.Input(self.hour,key='HOURS'), sg.Button('-', key='Hm')],
+        [sg.Text("Number of minutes:"), sg.Button('+', key='Mp'), sg.Input(self.hour,key='MINUTES'), sg.Button('-', key='Mm')],
+        [sg.Text("Number of seconds:"), sg.Button('+', key='Sp'), sg.Input(self.hour,key='SECONDS'), sg.Button('-', key='Sm')],
+        [sg.Button('START SESSION')],
+        ]
+        window = sg.Window('Pomodoro-App', layout, finalize=True)
+
+        while True:
+            event, values = window.read(timeout=0)
+            
+            
+            if event == sg.WIN_CLOSED:
+                break
+
+            if event == 'Hp':
+                self.hour += 1
+                # hour = hours_validation(hour)
+                window['HOURS'].update(value=str(self.hour))
+                
+            if event == 'Hm':
+                self.hour -= 1
+                # hour = hours_validation(hour)
+                window['HOURS'].update(value=str(self.hour))
+
+            if event == 'Mm':
+                self.min -= 1
+                # min = minutes_validation(min)
+                window['MINUTES'].update(value=str(self.min))
+
+            if event == 'Mp':
+                self.min += 1
+                # min = minutes_validation(min)
+                window['MINUTES'].update(value=str(self.min))
+
+            if event == 'Sm':
+                self.sec -= 1
+                # sec = minutes_validation(sec)
+                window['SECONDS'].update(value=str(self.sec))
+
+            if event == 'Sp':
+                self.sec += 1
+                # sec = minutes_validation(sec)
+                window['SECONDS'].update(value=str(self.sec))
+
+            if event == 'START SESSION':
+                self.hour = int(values['HOURS'])
+                self.min = int(values['MINUTES'])
+                self.sec = int(values['SECONDS'])
+                window.Hide()  
+                Tm = TimerWindow
+                Tm.start_timer_window(self)
+                window.UnHide()
+                
+        window.close()
+
 class TimerWindow(TimerMenu, Optionsmenu):
 
 
     def start_timer_window(self):
         self.running = True
-        self.default_break_time = 10
-        self.default_session_time = 10
-        self.default_big_break_time = 20
-        self.default_big_break_count = 4
         total_countdown_time = self.hour * 3600 + self.min * 60 + self.sec
         time_gone = 0
         total_pomodoros = 0
@@ -173,14 +172,14 @@ class TimerWindow(TimerMenu, Optionsmenu):
                     break
 
                 total_countdown_time -= 1
-                if time_gone == default_session_time:
+                if time_gone == self.default_session_time*60:
                     total_pomodoros += 1
                     time_gone = 0
 
-                    if total_pomodoros % default_big_break_count == 0:
+                    if total_pomodoros % self.default_big_break_count*60 == 0:
                         timer_window['LABEL'].update('Time for big break!')
 
-                        while time_gone < default_big_break_time:
+                        while time_gone < self.default_big_break_time*60:
                             timer_window['TIMER'].update(timer)
                             if total_countdown_time == -1:
                                 break
@@ -193,7 +192,7 @@ class TimerWindow(TimerMenu, Optionsmenu):
                     else:
                         timer_window['LABEL'].update('Time for break!')
 
-                        while time_gone < self.default_break_time:
+                        while time_gone < self.default_break_time*60:
                             
                             if total_countdown_time == -1:
                                 break
@@ -216,6 +215,38 @@ class TimerWindow(TimerMenu, Optionsmenu):
         return
 
 
+class MainMenu(TimerMenu):
+    sg.theme('DarkAmber')
+    
+    def start_main_menu(self):
+        op = Optionsmenu()
+        tm = TimerMenu()
+        main_menu_layout = [[sg.Text('Main Menu')],
+                        [sg.Button('Timer Menu', key='TM')],
+                        [sg.Button('Your Sessions', key='YS')],
+                        [sg.Button('Options', key='OP')],
+                        [sg.Button('Quit', key='QT')],
+                      ]
+        main_menu_window = sg.Window('Pomodoro App', main_menu_layout, finalize=True)
+        while True:
+            event, values = main_menu_window.read(timeout=0)
+
+            if event == 'TM':
+                main_menu_window.Hide() 
+                tm.start_timer_menu()
+                main_menu_window.UnHide()
+            
+            if event == 'YS': #to-do
+                continue
+
+            if event == 'OP':
+                main_menu_window.Hide()
+                op.start_options_window()
+                main_menu_window.UnHide()
+            
+            if event == sg.WIN_CLOSED or event == "QT":
+                main_menu_window.Close()
+                return
 
 
 
