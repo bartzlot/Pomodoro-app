@@ -1,8 +1,6 @@
 import PySimpleGUI as sg
 import time, datetime
-from pomodoro_modules import(  hours_validation,
-                                minutes_validation,
-                             )
+
 
 class Optionsmenu():
 
