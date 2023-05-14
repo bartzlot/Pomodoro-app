@@ -1,6 +1,4 @@
-import PySimpleGUI as sg
-import time
-from pomodoro_view import TimerMenu, OptionsMenu, MainMenu
+from pomodoro_view import MainMenu
+
 op = MainMenu()
 op.start_main_menu()
-
