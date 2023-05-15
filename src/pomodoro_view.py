@@ -292,11 +292,13 @@ class TimerWindow(TimerMenu):
 
                 total_countdown_time -= 1
                 if time_gone == (self.default_session_time*60):
+                    break_countdown_time = 0
                     total_pomodoros += 1
                     time_gone = 0
 
                     if total_pomodoros % self.default_big_break_count*60 == 0:
                         timer_window['LABEL'].update('Time for big break!')
+                        break_countdown_time = self.default_big_break_count*60
                         notify('Time for big break!', f'You made through {total_pomodoros} pomodoros!')
                         while time_gone < self.default_big_break_time*60:
                             timer_window['TIMER'].update(timer)
@@ -304,25 +306,29 @@ class TimerWindow(TimerMenu):
                             if total_countdown_time == -1:
                                 break
 
-                            timer = datetime.timedelta(seconds=total_countdown_time)
+                            timer = datetime.timedelta(seconds=break_countdown_time)
                             event = timer_window.read(timeout=0)
                             timer_window['TIMER'].update(timer)
+                            break_countdown_time -= 1
                             total_countdown_time -= 1
                             time.sleep(1)
                             time_gone += 1
                     else:
                         timer_window['LABEL'].update('Time for break!')
                         notify('Time for break!', f'You made through {total_pomodoros} pomodoros!')
+                        break_countdown_time = self.default_break_time*60
                         while time_gone < self.default_break_time*60:
                             
                             if total_countdown_time == -1:
                                 break
-                            timer = datetime.timedelta(seconds=total_countdown_time)
+                            timer = datetime.timedelta(seconds=break_countdown_time)
                             event = timer_window.read(timeout=0)
                             timer_window['TIMER'].update(timer)
+                            break_countdown_time -= 1
                             total_countdown_time -= 1 
                             time.sleep(1)
-                            time_gone += 1                            
+                            time_gone += 1
+                        notify('Time to learn again!', 'Stay focused, keep It up!')                         
                         time_gone = 0
                 event = timer_window.read(timeout=0)
                 timer_window['LABEL'].update('Time to learn!')

@@ -1,4 +1,4 @@
-from pomodoro_view import MainMenu
+import pomodoro_view
 
-op = MainMenu()
+op = pomodoro_view.MainMenu()
 op.start_main_menu()

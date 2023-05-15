@@ -2,6 +2,7 @@ import json
 from notifypy import Notify
 import PySimpleGUI as sg
 import os
+
 class ErrorsHandling():
     """Class containing error-handling mathods."""
     def handling_negatives(value: int, max_value: int):
@@ -69,8 +70,6 @@ class ErrorsHandling():
         sg.popup(f"File {path} doesn't exist, automatically creating one...")
         return False
 
-  
-
 
 def notify(t, m):
     """Sends system notification
@@ -88,6 +87,7 @@ def notify(t, m):
     n.application_name = 'Pomodoro-App'
     n.send()
     os.chdir('..')
+
 
 def saving_defaults_to_file(data: list, destination: str):
     """Saves default values to json file
