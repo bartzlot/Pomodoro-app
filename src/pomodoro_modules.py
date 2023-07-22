@@ -2,6 +2,7 @@ import json
 from notifypy import Notify
 import PySimpleGUI as sg
 import os
+import pathlib
 
 class ErrorsHandling():
     """Class containing error-handling mathods."""
@@ -81,7 +82,7 @@ class Utilities:
         n = Notify()
         n.title = t
         n.message = m
-        n.icon = 'icon.png'
+        n.icon = 'pomodoro_icon.png'
         n.application_name = 'Pomodoro-App'
         n.send()
         os.chdir('..')
@@ -111,3 +112,16 @@ class Utilities:
         with open(destination, "r") as f:
             object = json.load(f)
         return object
+    
+
+    def creating_path(filename: str):
+        """Creates path to file in assets folder
+
+        Args:
+            filename (str): asset file name
+        """
+        file_path = pathlib.PurePath(__file__)
+        file_path = file_path.parent.parent
+        file_path = file_path.joinpath('assets', filename)
+        return str(file_path)
+
